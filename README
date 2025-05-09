@@ -1,8 +1,7 @@
 # RAG‑Agentic – Retrieval‑Augmented ReAct Agent
----
 
-> **Version:** May 2025 · Requires LangChain ≥ 0.1.21 (modular stack)
-> **Main script:** `rag_agentic.py`
+**Version:** May 2025 · Requires LangChain ≥ 0.1.21 (modular stack)
+**Main script:** `rag_agentic.py`
 
 ## What it does
 
