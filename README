@@ -1,0 +1,103 @@
+# Write README.md to disk so user can download
+# RAG‑Agentic – Retrieval‑Augmented ReAct Agent
+---
+
+> **Version:** May 2025 · Requires LangChain ≥ 0.1.21 (modular stack)
+> **Main script:** `rag_agentic.py`
+
+## What it does
+
+* Loads a folder of knowledge‑base documents (`.pdf`, `.txt`, `.md`).
+* Builds an **in‑memory FAISS vector store** using OpenAI embeddings.
+* Wraps the retriever as a LangChain **tool** (`search_docs`).
+* Adds an `answer_direct` tool for answers known without search.
+* Prompts a GPT‑4o‑mini model with the **ReAct** pattern plus a _few‑shot_ example so the LLM follows the exact `Thought → Action → Observation → Final Answer` loop.
+* Executes via `AgentExecutor`, retrying automatically when the model’s output breaks the expected format.
+
+## Folder structure
+
+```text
+rag-agentic/
+├── rag_agentic.py     # ← main script (fully commented)
+├── README.md          # ← you are here
+├── requirements.txt   # minimal dependencies (optional)
+├── .env               # contains OPENAI_API_KEY=...
+└── docs/              # your PDFs/TXTs/MDs (can have sub‑folders)
+```
+
+## Prerequisites
+
+* Python 3.10+
+* An OpenAI API key with access to gpt-4o-mini or compatible model
+* A C++ build toolchain (only if FAISS needs to compile; on Windows use the pre‑built wheel from faiss-cpu)
+
+## Installation
+
+```bash
+# 1. Clone or download this repo
+cd rag-agentic
+
+# 2. (Optional) create a virtualenv
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
+
+# 3. Install runtime dependencies
+pip install \"langchain>=0.1.21\" langchain-community langchain-openai \\
+            faiss-cpu tiktoken python-dotenv pypdf
+
+# 4. Provide your OpenAI key
+echo \"OPENAI_API_KEY=sk-...\" > .env
+```
+Tip: keep .env out of version control.
+
+## Running the agent
+
+1. Put some documents into the docs/ directory (or create another folder).
+2. Run:
+
+```bash
+python rag_agentic.py --docs ./docs \"What is Retrieval‑Augmented Generation?\"
+```
+You’ll see verbose logs: documents loaded, vector store built, then the full ReAct chain (Thought / Action / Observation) until the Final Answer is printed.
+
+## Example session
+
+```bash
+[1/3] Loading documents …
+Loaded 7 docs.
+[2/3] Building vector store …
+[3/3] Creating agent …
+───────── AGENT ANSWER ─────────
+Retrieval‑Augmented Generation (RAG) is a pattern in which an LLM retrieves ...
+```
+
+## Customising
+
+| Task                  | How                                                                       |
+| --------------------- | ------------------------------------------------------------------------- |
+| Change model          | Edit `ChatOpenAI(model_name=\"gpt-4o-mini\")` in `rag_agentic.py`         |
+| Index more file types | Extend `load_documents()` with another `loader_cls`                       |
+| Persist FAISS to disk | Replace `FAISS.from_documents` with `FAISS.load_local()` / `save_local()` |
+| Add more tools        | Append new `Tool` objects before `tools = [...]`                          |
+
+## Troubleshooting
+
+| Symptom                                    | Cause / Fix                                                                                                                    |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `ModuleNotFoundError: langchain_community` | Install `langchain-community` 0.0.35+                                                                                          |
+| `NameError: DirectoryLoader`               | Same as above – package missing                                                                                                |
+| Output parsing errors                      | The agent will auto‑retry thanks to `handle_parsing_errors=True`; if it loops, lower temperature or add more few‑shot examples |
+| FAISS compile error on Windows             | Ensure you installed the **wheel** `faiss-cpu`, not the source dist                                                            |
+
+## Why FAISS in‑memory?
+
+* Simple, no external service to maintain.
+* Plenty fast for a few hundred/thousand docs.
+* Swap to a persistent store (Chroma, Weaviate, Pinecone) by changing just two lines.
+
+## Roadmap ideas
+
+* Swap ConversationBufferMemory for the new ConversationBufferWindow.
+* Add evaluation harness using LangChain LCEL + unit tests.
+* Expose a FastAPI/Streamlit front‑end.
+* Dockerfile for one‑command deployment.
+

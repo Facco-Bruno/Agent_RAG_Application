@@ -1,0 +1,18 @@
+# ───────── Core LangChain stack ─────────
+langchain>=0.1.21          # nucleus (LCEL, chains, agents)
+langchain-community>=0.0.35  # loaders, vector‑stores, tools
+langchain-openai>=0.0.9    # ChatOpenAI, OpenAIEmbeddings wrappers
+
+# ───────── Model & tokenizer ────────────
+openai>=1.30.0             # OpenAI Python SDK
+tiktoken>=0.7.0            # token counting
+
+# ───────── Vector store backend ─────────
+faiss-cpu>=1.7.4           # in‑process FAISS (CPU build)
+
+# ───────── Document loaders ─────────────
+pypdf>=4.1.0               # PDF parsing required by PyPDFLoader
+
+# ───────── Utilities ────────────────────
+python-dotenv>=1.0.1       # load OPENAI_API_KEY from .env
+
