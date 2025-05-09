@@ -1,0 +1,18 @@
+Manual do Projeto X
+====================
+
+1. Instalação
+-------------
+Execute `setup.sh` e siga as instruções na tela.
+
+2. Configuração
+---------------
+Edite o arquivo `config.yaml` e defina as variáveis de ambiente.
+
+3. Uso
+------
+Para iniciar, rode `./run.sh --mode production`.
+
+4. Suporte
+----------
+Envie e‑mail para suporte@empresa.com
